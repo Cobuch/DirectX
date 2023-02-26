@@ -1,16 +1,18 @@
+#include <iostream>
 #include "Game.h"
 
 void Game::CreateBackBuffer()
 {
-	auto res = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);	// __uuidof(ID3D11Texture2D)
+	auto res = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
 	res = Device->CreateRenderTargetView(backBuffer, nullptr, &RenderView);
 }
 
-Game::Game(LPCWSTR name, int screenWidth, int screenHeight) : Name(name), FrameCount(0), Components()
+Game::Game(LPCWSTR name, int screenWidth, int screenHeight) : Name(name), FrameCount(0)
 {
 	Instance = GetModuleHandle(nullptr);
 
-	Display = new DisplayWin32(name, Instance, screenWidth, screenHeight);
+	Display = new DisplayWin32(name, Instance, screenWidth, screenHeight, this);
+	InputDev = new InputDevice(this);
 
 	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1 };
 
@@ -35,7 +37,7 @@ Game::Game(LPCWSTR name, int screenWidth, int screenHeight) : Name(name), FrameC
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		D3D11_CREATE_DEVICE_DEBUG,
+		D3D11_CREATE_DEVICE_DEBUG | D3D11_CREATE_DEVICE_BGRA_SUPPORT,
 		featureLevel,
 		1,
 		D3D11_SDK_VERSION,
@@ -55,8 +57,12 @@ Game::Game(LPCWSTR name, int screenWidth, int screenHeight) : Name(name), FrameC
 
 Game::~Game()
 {
+	for (auto c : Components)
+	{
+		delete c;
+	}
 	delete Display;
-	delete InputDevice;
+	delete InputDev;
 	Context->Release();
 	backBuffer->Release();
 	RenderView->Release();
@@ -68,9 +74,11 @@ void Game::Exit()
 	DestroyResources();
 }
 
-void Game::MessageHandler(MSG& msg)
+void Game::MessageHandler()
 {
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+	MSG msg = {};
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -83,26 +91,21 @@ void Game::RestoreTargets()
 void Game::Run()
 {
 	Initialize();
-	MSG msg = {};
-	bool isExitRequested = false;
+	isExitRequested = false;
 	PrevTime = std::chrono::steady_clock::now();
-	while (!isExitRequested) {
-		// Handle the windows messages.
-		MessageHandler(msg);
-
-		// If windows signals to end the application then exit out.
-		if (msg.message == WM_QUIT) {
-			isExitRequested = true;
-		}
+	while (!isExitRequested)
+	{
+		MessageHandler();
 
 		auto	curTime = std::chrono::steady_clock::now();
-		float	deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 1000000.0f;
+		DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(curTime - PrevTime).count() / 1000000.0f;
 		PrevTime = curTime;
 
-		TotalTime += deltaTime;
+		TotalTime += DeltaTime;
 		FrameCount++;
 
-		if (TotalTime > 1.0f) {
+		if (TotalTime > 1.0f)
+		{
 			float fps = FrameCount / TotalTime;
 
 			TotalTime -= 1.0f;
@@ -118,11 +121,64 @@ void Game::Run()
 
 		Context->OMSetRenderTargets(1, &RenderView, nullptr);
 
+		Update();
+
 		Draw();
 
 		Context->OMSetRenderTargets(0, nullptr, nullptr);
 
-		SwapChain->Present(1, 0);
+		SwapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
 	}
 	Exit();
+}
+
+void Game::DestroyResources()
+{
+	for (auto c : Components)
+	{
+		c->DestroyResources();
+	}
+}
+
+void Game::Draw()
+{
+	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	Context->ClearRenderTargetView(RenderView, color);
+
+	for (auto c : Components)
+	{
+		c->Draw();
+	}
+}
+
+void Game::EndFrame()
+{
+}
+
+void Game::Initialize()
+{
+	for (auto c : Components)
+	{
+		c->Initialize();
+	}
+}
+
+void Game::PrepareFrame()
+{
+}
+
+void Game::PrepareResources()
+{
+}
+
+void Game::Update()
+{
+	for (auto c : Components)
+	{
+		c->Update();
+	}
+}
+
+void Game::UpdateInternal()
+{
 }

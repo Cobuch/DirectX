@@ -1,7 +1,8 @@
 #include "DisplayWin32.h"
 #include "Game.h"
 
-LRESULT CALLBACK WndProc1(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+
+LRESULT DisplayWin32::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
 	switch (umessage)
 	{
@@ -11,6 +12,7 @@ LRESULT CALLBACK WndProc1(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam
 		std::cout << "Key: " << static_cast<unsigned int>(wparam) << std::endl;
 
 		if (static_cast<unsigned int>(wparam) == 27) PostQuitMessage(0);
+
 		return 0;
 	}
 	default:
@@ -20,12 +22,15 @@ LRESULT CALLBACK WndProc1(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam
 	}
 }
 
-DisplayWin32::DisplayWin32(LPCWSTR applicationName, HINSTANCE hInst, int screenWidth, int screenHeight)
+
+
+DisplayWin32::DisplayWin32(LPCWSTR applicationName, HINSTANCE hInst, int screenWidth, int screenHeight, Game* g)
 {
 	hInstance = hInst;
+	game = g;
 
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wc.lpfnWndProc = WndProc1;
+	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
@@ -46,7 +51,7 @@ DisplayWin32::DisplayWin32(LPCWSTR applicationName, HINSTANCE hInst, int screenW
 	RECT windowRect = { 0, 0, static_cast<LONG>(ClientWidth), static_cast<LONG>(ClientHeight) };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	auto dwStyle = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_THICKFRAME;
+	auto dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
 	auto posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
 	auto posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
@@ -63,4 +68,16 @@ DisplayWin32::DisplayWin32(LPCWSTR applicationName, HINSTANCE hInst, int screenW
 	SetFocus(hWnd);
 
 	ShowCursor(true);
+
+	RAWINPUTDEVICE Rid[1];
+
+	Rid[0].usUsagePage = 0x01;          // HID_USAGE_PAGE_GENERIC
+	Rid[0].usUsage = 0x02;              // HID_USAGE_GENERIC_MOUSE
+	Rid[0].dwFlags = 0;
+	Rid[0].hwndTarget = 0;
+
+	if (RegisterRawInputDevices(Rid, 1, sizeof(Rid[0])) == FALSE)
+	{
+		// Registration failed. Call GetLastError for the cause of the error
+	}
 }

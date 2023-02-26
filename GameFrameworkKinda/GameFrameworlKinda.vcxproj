@@ -127,23 +127,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BallComponent.h" />
+    <ClInclude Include="Delegates.h" />
     <ClInclude Include="DisplayWin32.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="Keys.h" />
     <ClInclude Include="InputDevice.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="PlayerComponent.h" />
+    <ClInclude Include="SimpleMath.h" />
+    <ClInclude Include="SquareComponent.h" />
     <ClInclude Include="Starter.h" />
     <ClInclude Include="TriangleComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BallComponent.cpp" />
+    <ClCompile Include="Delegates.cpp" />
     <ClCompile Include="DisplayWin32.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameComponent.cpp" />
+    <ClCompile Include="Go.cpp" />
     <ClCompile Include="InputDevice.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PlayerComponent.cpp" />
+    <ClCompile Include="SimpleMath.cpp" />
+    <ClCompile Include="SquareComponent.cpp" />
     <ClCompile Include="Starter.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="SimpleMath.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Delegates.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
