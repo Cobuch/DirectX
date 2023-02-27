@@ -3,6 +3,7 @@
 #include "GameComponent.h"
 #include "PlayerComponent.h"
 #include "BallComponent.h"
+#include "DisplayWin32.h"
 #include <d2d1.h>
 #include <dwrite.h>
 
@@ -29,8 +30,8 @@ protected:
 	IDXGISurface* D2DBackBuff;
 public:
 	std::chrono::steady_clock::time_point ContinueTime;
-	PlayerComponent* racket1;
-	PlayerComponent* racket2;
+	PlayerComponent* player1;
+	PlayerComponent* player2;
 	BallComponent* ball;
 	GameState state;
 	Starter();

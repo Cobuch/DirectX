@@ -57,7 +57,7 @@ BallComponent::BallComponent(Game* g) : SquareComponent(g)
 	pGame = dynamic_cast<Starter*>(g);
 	SimpleMath::Vector4 pointsTmp[8] = {
 		SimpleMath::Vector4(0.01f, 0.01f, 0.5f, 1.0f),	SimpleMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		SimpleMath::Vector4(-0.01f, -0.01f, 0.5f, 1.0f),	SimpleMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		SimpleMath::Vector4(-0.01f, -0.01f, 0.5f, 1.0f), SimpleMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f),
 		SimpleMath::Vector4(0.01f, -0.01f, 0.5f, 1.0f),	SimpleMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f),
 		SimpleMath::Vector4(-0.01f, 0.01f, 0.5f, 1.0f),	SimpleMath::Vector4(1.0f, 1.0f, 1.0f, 1.0f),
 	};
@@ -84,15 +84,15 @@ void BallComponent::Update()
 			nextPos.y = 0.0f;
 			GenRndDirection();
 		}
-		else if (LineRectColl(GetPosition() * 800, nextPos * 800, pGame->racket1->CollisionBox, false, nextPos))
+		else if (LineRectColl(GetPosition() * 800, nextPos * 800, pGame->player1->CollisionBox, false, nextPos))
 		{
-			SimpleMath::Vector2::Lerp(SimpleMath::Vector2(1.f, -1.f), SimpleMath::Vector2(1.f, 1.f), abs(GetY() - pGame->racket1->GetY() + 0.1f) / 0.2f, Direction);
+			SimpleMath::Vector2::Lerp(SimpleMath::Vector2(1.f, -1.f), SimpleMath::Vector2(1.f, 1.f), abs(GetY() - pGame->player1->GetY() + 0.1f) / 0.2f, Direction);
 			Direction.Normalize();
 			nextPos += Direction * Speed * game->DeltaTime;
 		}
-		else if (LineRectColl(GetPosition() * 800, nextPos * 800, pGame->racket2->CollisionBox, true, nextPos))
+		else if (LineRectColl(GetPosition() * 800, nextPos * 800, pGame->player2->CollisionBox, true, nextPos))
 		{
-			SimpleMath::Vector2::Lerp(SimpleMath::Vector2(-1.f, -1.f), SimpleMath::Vector2(-1.f, 1.f), abs(GetY() - pGame->racket2->GetY() + 0.1f) / 0.2f, Direction);
+			SimpleMath::Vector2::Lerp(SimpleMath::Vector2(-1.f, -1.f), SimpleMath::Vector2(-1.f, 1.f), abs(GetY() - pGame->player2->GetY() + 0.1f) / 0.2f, Direction);
 			Direction.Normalize();
 			nextPos += Direction * Speed * game->DeltaTime;
 		}

@@ -10,8 +10,8 @@ class DisplayWin32
 {
 private:
 	Game* game;
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 public:
+	//static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 	int ClientHeight;
 	int ClientWidth;
 	HINSTANCE hInstance;

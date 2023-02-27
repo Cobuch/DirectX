@@ -20,35 +20,30 @@ static float DifficultyCurve(std::chrono::steady_clock::time_point continueTime)
 void Starter::Update()
 {
     ball->Speed = DifficultyCurve(ContinueTime);
-    /*if (InputDev->IsKeyDown(Keys::Escape))
-        isExitRequested = true;*/
     if (state == PONG_STATE_COOLDOWN && std::chrono::steady_clock::now() >= ContinueTime)
         state = PONG_STATE_NORMAL;
 
-    if (InputDev->IsKeyDown(Keys::Up) && InputDev->IsKeyDown(Keys::Down)) {
-        return;
-    }
+    if (InputDev->IsKeyDown(Keys::W) && player1->GetY() < 0.89f)
+        player1->SetY(player1->GetY() + DeltaTime * player1->Speed);
+    if (InputDev->IsKeyDown(Keys::S) && player1->GetY() > -0.89f)
+        player1->SetY(player1->GetY() - DeltaTime * player1->Speed);
 
-    if (InputDev->IsKeyDown(Keys::Up) == 38 && racket1->GetY() < 0.89f) {
-        float delta = (racket1->GetY() + DeltaTime * racket1->Speed);
-        Move(DirectX::SimpleMath::Vector3(0.0f, delta, 0.0f));
-    }
-    else if (InputDev->IsKeyDown(Keys::Down) == 40 && racket1->GetY() > -0.89f) {
-        float delta = (racket1->GetY() - DeltaTime * racket1->Speed);
-        Move(DirectX::SimpleMath::Vector3(0.0f, delta, 0.0f));
-    }
-    /*if (InputDev->IsKeyDown(Keys::W) && racket1->GetY() < 0.89f)
-        racket1->SetY(racket1->GetY() + DeltaTime * racket1->Speed);
-    if (InputDev->IsKeyDown(Keys::S) && racket1->GetY() > -0.89f)
-        racket1->SetY(racket1->GetY() - DeltaTime * racket1->Speed);
+    if (InputDev->IsKeyDown(Keys::D) && player1->GetX() < -0.1f)
+        player1->SetX(player1->GetX() + DeltaTime * player1->Speed);
+    if (InputDev->IsKeyDown(Keys::A) && player1->GetX() > -0.9f)
+        player1->SetX(player1->GetX() - DeltaTime * player1->Speed);
 
 
+    if (InputDev->IsKeyDown(Keys::Up) && player2->GetY() < 0.89f)
+        player2->SetY(player2->GetY() + DeltaTime * player2->Speed);
+    if (InputDev->IsKeyDown(Keys::Down) && player2->GetY() > -0.89f)
+        player2->SetY(player2->GetY() - DeltaTime * player2->Speed);
+    
+    if (InputDev->IsKeyDown(Keys::Right) && player2->GetX() < 0.9f)
+        player2->SetX(player2->GetX() + DeltaTime * player2->Speed);
+    if (InputDev->IsKeyDown(Keys::Left) && player2->GetX() > 0.1f)
+        player2->SetX(player2->GetX() - DeltaTime * player2->Speed);
 
-
-    if (InputDev->IsKeyDown(Keys::Up) && racket2->GetY() < 0.89f)
-        racket2->SetY(racket2->GetY() + DeltaTime * racket2->Speed);
-    if (InputDev->IsKeyDown(Keys::Down) && racket2->GetY() > -0.89f)
-        racket2->SetY(racket2->GetY() - DeltaTime * racket2->Speed);*/
 
 
     Game::Update();
@@ -57,13 +52,13 @@ void Starter::Update()
 Starter::Starter() : Game(L"MyGame", 800, 800)
 {
     srand(static_cast<unsigned>(time(nullptr)));
-    racket1 = new PlayerComponent(this);
-    racket1->SetX(-0.9f);
-    racket2 = new PlayerComponent(this);
-    racket2->SetX(0.9f);
+    player1 = new PlayerComponent(this);
+    player1->SetX(-0.9f);
+    player2 = new PlayerComponent(this);
+    player2->SetX(0.9f);
     ball = new BallComponent(this);
-    Components.push_back(racket1);
-    Components.push_back(racket2);
+    Components.push_back(player1);
+    Components.push_back(player2);
     Components.push_back(ball);
     state = PONG_STATE_COOLDOWN;
     ContinueTime = std::chrono::steady_clock::now() + std::chrono::seconds(1);
@@ -193,7 +188,7 @@ void Starter::IncScore(bool p)
         s1 += 1;
     else
         s2 += 1;
-    if (s1 > 10 || s2 > 10)
+    if (s1 >= 10 || s2 >= 10)
         state = PONG_STATE_GAMEOVER;
 }
 
